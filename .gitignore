@@ -1,0 +1,5 @@
+*.pyc
+sample/*.pyc
+tests/*.pyc
+*.pdf
+*.log
