@@ -3,3 +3,5 @@ sample/*.pyc
 tests/*.pyc
 *.pdf
 *.log
+.pydevproject
+.project

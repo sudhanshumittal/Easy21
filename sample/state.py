@@ -10,9 +10,10 @@ class State(tuple):
             dealer = randint(1, 10)
             player = randint(1, 10)
             obj = super(State, cls).__new__(cls, (dealer, player))
-        else:
-            assert(len(args) == 2), "invalid arguments passed"
+        elif len(args) == 2:
             obj = super(State, cls).__new__(cls, args)
+        else:
+            obj = super(State, cls).__new__(cls, args[0])
         logging.debug("""<dealer: %s player: %s>""" % (obj[0], obj[1]))
         return obj    
     
