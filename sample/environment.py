@@ -20,11 +20,11 @@ class Env(object):
         
         probability = random()
         card = None
-        if probability <= float(2) / 3:
+        if probability <= 2./3. :
             card = draw_black_card()
         else:
             card = draw_red_card()
-        logging.info("card drawn: "+str(card))
+        logging.debug("card drawn: "+str(card))
         return card
 
     def is_bust(self, score):
@@ -57,28 +57,26 @@ class Env(object):
         assert isinstance(state, State), 'First argument should be State!'
         assert action in [self.HIT, self.STICK], action
 
-        player = state.player
-        dealer = state.dealer
+        player = state.player()
+        dealer = state.dealer()
         done = False
         
         if action == self.HIT:
-            logging.info("player chose to hit")
             player += self.draw_card()
             if self.is_bust(player):
+                logging.debug("player went bust")
                 done = True
-                logging.info("player went bust")
 
-        elif action == self.STICK:
-            logging.info("player chose to stick. Dealer will play now...")
+        else:
             next_dealer_action = self.HIT
-            while not self.is_bust(dealer) and next_dealer_action == self.HIT:
+            while next_dealer_action == self.HIT and not self.is_bust(dealer):
                 dealer += self.draw_card()
                 next_dealer_action = self.dealer.get_action(dealer);
             if self.is_bust(dealer):
-                logging.info("dealer went bust")
+                logging.debug("dealer went bust")
             done = True
 
-        reward = self.get_reward(player, dealer)
+        reward = self.get_reward(player, dealer) if done else 0
         return State(dealer, player), reward, done
 
     def __init__(self):

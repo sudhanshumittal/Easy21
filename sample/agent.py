@@ -3,4 +3,4 @@ class agent(object):
 	def __init__(self):
 		self.HIT = 0;
 		self.STICK = 1;
-		self.actions_space = [self.HIT, self.STICK]
+		self.action_space = [self.HIT, self.STICK]
