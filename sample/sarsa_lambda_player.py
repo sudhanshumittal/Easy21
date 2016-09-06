@@ -21,7 +21,7 @@ class sarsa_lambda_player(agent):
             step_size = (1. / self.N[key])
             self.Q[key] += step_size * TD_error * E[key]
             
-    def update_eligibility_traces(self, E):
+    def decay_eligibility_traces(self, E):
         for key in E.keys():
             E[key] *= self.gamma * self.lmbd
             
@@ -29,10 +29,13 @@ class sarsa_lambda_player(agent):
         visits = self.N[state + (self.HIT,)] + self.N[state + (self.STICK,)]
         epsilon = self.No / (self.No + visits)
         action_values = [ self.Q[state + (action,)] for action in self.action_space]
-        action = epsilon_greedy_action(self, epsilon, action_values)
+        action = epsilon_greedy_action(epsilon, action_values)
         logging.debug("sarsa_lambda_player action:" + str(action))
         return int(action)
-    
+    def get_td_error(self, reward, curr_state, curr_action, next_state, next_action):  # override
+        return reward + self.Q[next_state + (next_action,)] - self.Q[curr_state + (curr_action,)]
+    def increment_eligibility_trace(self, E, state, action):
+        E[state + (action,)] += 1.
     def __call__(self, env, iterations=1):
         assert(isinstance(env, Env)), "invalid argument type: env"
         for _ in xrange(0, iterations):
@@ -49,10 +52,10 @@ class sarsa_lambda_player(agent):
                 logging.info(" state:" + str(curr_state) + " action:" + str(curr_action) + \
                              " reward :" + str(reward) + " next state:" + next_state.__str__()\
                              + "next action:" + str(next_action))
-                TD_error = reward + self.Q[next_state + (next_action,)] - self.Q[curr_state + (curr_action,)]
-                E[curr_state + (curr_action,)] += 1.
+                TD_error = self.get_td_error(reward, curr_state, curr_action, next_state, next_action)
+                self.increment_eligibility_trace(E, curr_state, curr_action)
                 self.update_state_action_values(state_action_visited_in_episode, TD_error, E)
-                self.update_eligibility_traces(E)
+                self.decay_eligibility_traces(E)
                 curr_state = next_state
                 curr_action = next_action
                 

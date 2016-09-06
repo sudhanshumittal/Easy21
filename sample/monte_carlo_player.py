@@ -33,7 +33,7 @@ class monte_carlo_player(agent):
         visits = self.N[state + (self.HIT,)] + self.N[state + (self.STICK,)]
         epsilon = self.No / (self.No + visits)
         action_values = [self.Q[state + (action,)] for action in self.action_space]
-        action = epsilon_greedy_action(self, epsilon, action_values)
+        action = epsilon_greedy_action(epsilon, action_values)
         logging.debug("monte_carlo_player action:" + str(action))
         return int(action)
     
